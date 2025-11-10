@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register Staff TU</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f4f4f4;
+      font-family: "Times New Roman", serif;
+    }
+    .register-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .register-card {
+      background-color: #e6e6e6;
+      border-radius: 10px;
+      padding: 30px;
+      width: 350px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .logo {
+      max-width: 250px;
+      margin-right: 60px;
+    }
+    .register-btn {
+      background-color: #000;
+      color: #fff;
+      font-weight: bold;
+      border: none;
+      transition: 0.3s;
+    }
+    .register-btn:hover {
+      background-color: #444;
+    }
+    .login-link {
+      font-size: 14px;
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container register-container">
+    <div class="row align-items-center">
+      <!-- Logo Polibatam -->
+      <div class="col-md-6 text-center">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/Logo_Politeknik_Negeri_Batam.png" alt="Polibatam Logo" class="logo">
+      </div>
+
+      <!-- Form Register -->
+      <div class="col-md-6 d-flex justify-content-center">
+        <div class="register-card">
+          <h5 class="text-center mb-4 fw-bold">Register Akun</h5>
+          <form action="proses_register.php" method="POST">
+            <div class="mb-3">
+              <label for="nama" class="form-label">Nama Lengkap</label>
+              <input type="text" class="form-control" id="nama" name="nama" required>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn register-btn w-100">Register</button>
+          </form>
+          <div class="login-link">
+            <small>Sudah Punya Akun? <a href="login.html" class="text-secondary">Silahkan Login!</a></small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
