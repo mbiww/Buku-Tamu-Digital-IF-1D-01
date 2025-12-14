@@ -1,8 +1,8 @@
 <?php
 // Jika nanti mau ambil data dari database, taruh query di sini.
 // Contoh:
-// include 'koneksi.php';
-// $tamu = mysqli_query($conn, "SELECT * FROM tamu");
+include 'koneksi.php';
+$tamu = mysqli_query($koneksi, "SELECT * FROM data_tamu");
 ?>
 
 <!DOCTYPE html>
@@ -83,42 +83,21 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1.</td>
-            <td>Dimas Setiawan</td>
-            <td>Mahasiswa</td>
-            <td>Mahasiswa</td>
-            <td>Mengambil Surat</td>
-            <td>10.30-11.00, 01/08/25</td>
-            <td><a href="#" class="text-decoration-none text-dark fw-bold">Edit</a></td>
-          </tr>
-          <tr>
-            <td>2.</td>
-            <td>Bu Rani</td>
-            <td>PT. Maju Jaya</td>
-            <td>Non-Mahasiswa</td>
-            <td>Menemui Kepala TU</td>
-            <td>13.00-14.00, 02/08/25</td>
-            <td><a href="#" class="text-decoration-none text-dark fw-bold">Edit</a></td>
-          </tr>
-          <tr>
-            <td>3.</td>
-            <td>Andi Pratama</td>
-            <td>Alumni</td>
-            <td>Non-Mahasiswa</td>
-            <td>Menagambil Ijazah</td>
-            <td>13.30-14.00, 02/08/25</td>
-            <td><a href="#" class="text-decoration-none text-dark fw-bold">Edit</a></td>
-          </tr>
-          <tr>
-            <td>4.</td>
-            <td>Umar</td>
-            <td>Mahasiswa</td>
-            <td>Mahasiswa</td>
-            <td>Mengambil Surat</td>
-            <td>15.00-15.30, 02/08/25</td>
-            <td><a href="#" class="text-decoration-none text-dark fw-bold">Edit</a></td>
-          </tr>
+
+          <?php
+    $no = 1;
+    while ($data = mysqli_fetch_array($tamu)) {
+    ?>
+    <tr>
+        <td><?= $no++; ?></td>
+        <td><?= $data['nama_lengkap']; ?></td>
+        <td><?= $data['institusi']; ?></td>
+        <td><?= $data['jenis_pengguna']; ?></td>
+        <td><?= $data['keperluan']; ?></td>
+        <td><?= $data['created_at']; ?></td>
+        <td><a href="#" class="text-decoration-none text-dark fw-bold">Edit</a></td>
+    </tr>
+    <?php } ?>
         </tbody>
       </table>
 
