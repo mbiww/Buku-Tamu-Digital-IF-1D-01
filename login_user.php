@@ -4,34 +4,43 @@ require_once 'koneksi.php';
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $no_id = $_POST['no_id'];
+    $no_id    = $_POST['no_id'];
     $password = $_POST['password'];
 
-    // Cek apakah no_id ada
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE no_id = ?");
-    $stmt->execute([$no_id]);
-    $user = $stmt->fetch();
+    // Prepare statement (MySQLi)
+    $stmt = mysqli_prepare($koneksi, "SELECT * FROM users WHERE no_id = ?");
+    mysqli_stmt_bind_param($stmt, "s", $no_id);
+    mysqli_stmt_execute($stmt);
+
+    $result = mysqli_stmt_get_result($stmt);
+    $user   = mysqli_fetch_assoc($result);
 
     if ($user && password_verify($password, $user['password'])) {
         // Login berhasil
-        $_SESSION['no_id'] = $user['no_id'];
+        $_SESSION['no_id']         = $user['no_id'];
         $_SESSION['nama_lengkap'] = $user['nama_lengkap'];
-        $_SESSION['email'] = $user['email'];
-        $_SESSION['role'] = $user['role'];
-        $_SESSION['type_tamu'] = $user['type_tamu'];
+        $_SESSION['email']        = $user['email'];
+        $_SESSION['role']         = $user['role'];
+
         if ($user['role'] == "mahasiswa") {
-            header('Location: form_tamu_mahasiswa.php'); exit;
-        } else if ($user['role'] == "instansi") {
-            header('Location: form_tamu_instansi.php'); exit;
-        } else if ($user['role'] == "admin") {
-            header('location: dashboard_admin.php'); exit;
+            header('Location: form_tamu_mahasiswa.php');
+            exit;
+        } elseif ($user['role'] == "instansi") {
+            header('Location: form_tamu_instansi.php');
+            exit;
+        } elseif ($user['role'] == "admin") {
+            header('Location: dashboard_admin.php');
+            exit;
         }
 
     } else {
         $error = "No ID atau password salah!";
     }
+
+    mysqli_stmt_close($stmt);
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
