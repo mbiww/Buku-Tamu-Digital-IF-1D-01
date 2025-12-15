@@ -2,6 +2,34 @@
 // Jika mau mengambil nama staff dari session
 // session_start();
 // $nama_staff = $_SESSION['nama'] ?? 'Nama Staff';
+include 'koneksi.php';
+$tamu = mysqli_query($koneksi, "SELECT * FROM data_tamu ORDER BY id DESC");
+$q1 = mysqli_query($koneksi, "
+    SELECT COUNT(*) AS total 
+    FROM data_tamu
+    WHERE DATE(created_at) = CURDATE()
+");
+$data_hari_ini = mysqli_fetch_assoc($q1)['total'];
+$q2 = mysqli_query($koneksi, "
+    SELECT COUNT(*) AS total 
+    FROM data_tamu
+    WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+");
+$data_bulan_terakhir = mysqli_fetch_assoc($q2)['total'];
+$q3 = mysqli_query($koneksi, "
+    SELECT COUNT(*) AS total 
+    FROM data_tamu
+    WHERE DATE(created_at) = CURDATE()
+    AND jenis_pengguna = 'mahasiswa'
+");
+$mahasiswa_hari_ini = mysqli_fetch_assoc($q3)['total'];
+$q4 = mysqli_query($koneksi, "
+    SELECT COUNT(*) AS total 
+    FROM data_tamu  
+    WHERE DATE(created_at) = CURDATE()
+    AND jenis_pengguna = 'instansi'
+");
+$instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
 $nama_staff = "Nama Staff"; // sementara pakai dummy
 ?>
 <!DOCTYPE html>
@@ -72,28 +100,36 @@ $nama_staff = "Nama Staff"; // sementara pakai dummy
       <div class="col-md-3">
         <div class="card p-3">
           <h5>Total Tamu Hari Ini</h5>
-          <h3>10</h3>
+          <h3>
+            <?= $data_hari_ini;?>
+          </h3>
         </div>
       </div>
 
       <div class="col-md-3">
         <div class="card p-3">
           <h5>Total Kunjungan Bulanan</h5>
-          <h3>245</h3>
+          <h3>
+            <?= $data_bulan_terakhir;?>
+          </h3>
         </div>
       </div>
 
       <div class="col-md-3">
         <div class="card p-3">
-          <h5>Tamu Online (Mahasiswa)</h5>
-          <h3>150</h3>
+          <h5>Tamu Mahasiswa</h5>
+          <h3>
+          <?= $mahasiswa_hari_ini;?>
+          </h3>
         </div>
       </div>
 
       <div class="col-md-3">
         <div class="card p-3">
           <h5>Tamu Non-Mahasiswa</h5>
-          <h3>95</h3>
+          <h3>
+            <?= $instansi_hari_ini;?>
+          </h3>
         </div>
       </div>
 
@@ -112,30 +148,26 @@ $nama_staff = "Nama Staff"; // sementara pakai dummy
             <tr>
               <th>No.</th>
               <th>Nama Tamu</th>
-              <th>Keperluan</th>
-              <th>Jam Kunjungan</th>
               <th>Jenis Tamu</th>
+              <th>Instansi</th>
+              <th>Keperluan</th>
             </tr>
           </thead>
           <tbody>
 
             <!-- Contoh data (bisa diganti dari database nanti) -->
-            <tr>
-              <td>1</td>
-              <td>Dimas Setiawan</td>
-              <td>Mengambil Surat</td>
-              <td>10.30 - 01/08/25</td>
-              <td>Mahasiswa</td>
-            </tr>
-
-            <tr>
-              <td>2</td>
-              <td>Bu Rani</td>
-              <td>Menemui Humas</td>
-              <td>13.00 - 02/08/25</td>
-              <td>Non-Mahasiswa</td>
-            </tr>
-
+            <?php
+    $no = 1;
+    while ($data = mysqli_fetch_array($tamu)) {
+    ?>
+    <tr>
+        <td><?= $no++; ?></td>
+        <td><?= $data['nama_lengkap']; ?></td>
+        <td><?= $data['jenis_pengguna']; ?></td>
+        <td><?= $data['institusi']; ?></td>
+        <td><?= $data['keperluan']; ?></td>
+    </tr>
+    <?php } ?>
           </tbody>
         </table>
 

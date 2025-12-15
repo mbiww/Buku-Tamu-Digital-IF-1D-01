@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = "Format email tidak valid!";
     } else {
         // Cek apakah no_id atau email sudah terdaftar
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE no_id = ? OR email = ?");
+        $stmt = $koneksi->prepare("SELECT * FROM users WHERE no_id = ? OR email = ?");
         $stmt->execute([$no_id, $email]); 
         
         if ($stmt->rowCount() > 0) {
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             
             // Simpan ke database
-            $stmt = $pdo->prepare("INSERT INTO users (no_id, nama_lengkap, email, role, institusi, password,created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+            $stmt = $koneksi->prepare("INSERT INTO users (no_id, nama_lengkap, email, role, institusi, password,created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
             
             if ($stmt->execute([$no_id, $nama_lengkap, $email, $role, $institusi, $hashedPassword])) {
                 $success = "Registrasi berhasil! Silakan login.";
