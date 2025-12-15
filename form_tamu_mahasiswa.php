@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         try {
             // Simpan data tamu ke database
-            $stmt = $pdo->prepare("INSERT INTO data_tamu (nama_lengkap, no_id, institusi, alamat, no_wa, keperluan, jenis_pengguna, created_at) VALUES (?, ?, ?, ?, ?, ?, 'mahasiswa', NOW())");
+            $stmt = mysqli_prepare($koneksi, "INSERT INTO data_tamu (nama_lengkap, no_id, institusi, alamat, no_wa, keperluan, jenis_pengguna, created_at) VALUES (?, ?, ?, ?, ?, ?, 'mahasiswa', NOW())");
             
             if ($stmt->execute([$nama_lengkap, $no_id, $institusi, $alamat, $no_wa, $keperluan])) {
                 $success = "Data tamu berhasil dikirim!";
