@@ -6,43 +6,55 @@ $error = '';
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $no_id = $_POST['no_id'];
+    $no_id         = $_POST['no_id'];
     $nama_lengkap = $_POST['nama_lengkap'];
-    $email = $_POST['email'];
-    $role     = $_POST['role'];
-    $institusi = $_POST['institusi'];
-    $password = $_POST['password'];
+    $email        = $_POST['email'];
+    $role         = $_POST['role'];
+    $institusi    = $_POST['institusi'];
+    $password     = $_POST['password'];
 
-    // Validasi input
     if (empty($no_id) || empty($nama_lengkap) || empty($email) || empty($role) || empty($institusi) || empty($password)) {
         $error = "Semua field harus diisi!";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Format email tidak valid!";
     } else {
-        // Cek apakah no_id atau email sudah terdaftar
-        $stmt = $koneksi->prepare("SELECT * FROM users WHERE no_id = ? OR email = ?");
-        $stmt->execute([$no_id, $email]); 
-        
-        if ($stmt->rowCount() > 0) {
+
+        $stmt = mysqli_prepare(
+            $koneksi,
+            "SELECT no_id FROM users WHERE no_id = ? OR email = ?"
+        );
+        mysqli_stmt_bind_param($stmt, "ss", $no_id, $email);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_store_result($stmt);
+
+        if (mysqli_stmt_num_rows($stmt) > 0) {
             $error = "Nomor ID atau email sudah terdaftar!";
         } else {
-            // Hash password
+
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-            
-            // Simpan ke database
-            $stmt = $koneksi->prepare("INSERT INTO users (no_id, nama_lengkap, email, role, institusi, password,created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
-            
-            if ($stmt->execute([$no_id, $nama_lengkap, $email, $role, $institusi, $hashedPassword])) {
+
+            $stmt = mysqli_prepare(
+                $koneksi,
+                "INSERT INTO users 
+                (no_id, nama_lengkap, email, role, institusi, password, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, NOW())"
+            );
+
+            mysqli_stmt_bind_param($stmt, "ssssss", $no_id, $nama_lengkap, $email, $role,$institusi, $hashedPassword);
+
+            if (mysqli_stmt_execute($stmt)) {
                 $success = "Registrasi berhasil! Silakan login.";
-                // Redirect ke halaman login setelah 2 detik
                 header("refresh:2;url=login_user.php");
             } else {
                 $error = "Terjadi kesalahan saat registrasi!";
             }
         }
+
+        mysqli_stmt_close($stmt);
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
