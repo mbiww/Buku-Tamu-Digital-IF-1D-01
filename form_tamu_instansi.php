@@ -4,40 +4,56 @@ session_start();
 require_once 'koneksi.php';
 
 if (!isset($_SESSION['no_id']) || $_SESSION['role'] != 'instansi') {
-    header('Location: login_user.php');
-    exit;
+  header('Location: login_user.php');
+  exit;
 }
 
 $success = '';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nama_lengkap = $_POST['nama_lengkap'];
-    $no_id = $_POST['no_id'];
-    $institusi = $_POST['institusi'];
-    $alamat = $_POST['alamat'];
-    $no_wa = $_POST['number'];
-    $keperluan = $_POST['message'];
-    
-    // Validasi input
-    if (empty($nama_lengkap) || empty($no_id) || empty($institusi) || empty($alamat) || empty($no_wa) || empty($keperluan)) {
-        $error = "Semua field harus diisi!";
-    } else {
-        try {
-            // Simpan data tamu ke database
-            $stmt = $pdo->prepare("INSERT INTO data_tamu (nama_lengkap, no_id, institusi, alamat, no_wa, keperluan, jenis_pengguna, created_at) VALUES (?, ?, ?, ?, ?, ?, 'instansi', NOW())");
-            
-            if ($stmt->execute([$nama_lengkap, $no_id, $institusi, $alamat, $no_wa, $keperluan])) {
-                $success = "Data tamu berhasil dikirim!";
-                // Reset form setelah berhasil
-                $_POST = array();
-            } else {
-                $error = "Terjadi kesalahan saat menyimpan data!";
-            }
-        } catch (PDOException $e) {
-            $error = "Error: " . $e->getMessage();
-        }
+  $nama_lengkap = $_POST['nama_lengkap'];
+  $no_id = $_POST['no_id'];
+  $institusi = $_POST['institusi'];
+  $alamat = $_POST['alamat'];
+  $no_wa = $_POST['number'];
+  $keperluan = $_POST['message'];
+
+  // Validasi input
+  if (empty($nama_lengkap) || empty($no_id) || empty($institusi) || empty($alamat) || empty($no_wa) || empty($keperluan)) {
+    $error = "Semua field harus diisi!";
+  } else {
+    try {
+      // Simpan data tamu ke database
+      $stmt = mysqli_prepare(
+        $koneksi,
+        "INSERT INTO data_tamu 
+    (nama_lengkap, no_id, institusi, alamat, no_wa, keperluan, jenis_pengguna, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, 'instansi', NOW())"
+      );
+
+      mysqli_stmt_bind_param(
+        $stmt,
+        "ssssss",
+        $nama_lengkap,
+        $no_id,
+        $institusi,
+        $alamat,
+        $no_wa,
+        $keperluan
+      );
+
+      if (mysqli_stmt_execute($stmt)) {
+        $success = "Data tamu berhasil dikirim!";
+        $_POST = array(); // reset form
+      } else {
+        $error = "Terjadi kesalahan saat menyimpan data!";
+      }
+
+    } catch (PDOException $e) {
+      $error = "Error: " . $e->getMessage();
     }
+  }
 }
 ?>
 
