@@ -26,7 +26,7 @@ $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    $no_id    = $_POST['no_id'];
+    $no_id = $_POST['no_id'];
     $password = $_POST['password'];
 
     $stmt = mysqli_prepare($koneksi, "SELECT * FROM users WHERE no_id = ?");
@@ -34,24 +34,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     mysqli_stmt_execute($stmt);
 
     $result = mysqli_stmt_get_result($stmt);
-    $user   = mysqli_fetch_assoc($result);
+    $user = mysqli_fetch_assoc($result);
 
     if ($user && password_verify($password, $user['password'])) {
 
         /* =============================
            SIMPAN SESSION
         ============================= */
-        $_SESSION['no_id']        = $user['no_id'];
+        $_SESSION['no_id'] = $user['no_id'];
         $_SESSION['nama_lengkap'] = $user['nama_lengkap'];
-        $_SESSION['email']        = $user['email'];
-        $_SESSION['role']         = $user['role'];
-        $_SESSION['type_tamu']    = $user['type_tamu'];
+        $_SESSION['email'] = $user['email'];
+        $_SESSION['role'] = $user['role'];
+        $_SESSION['type_tamu'] = $user['type_tamu'];
 
         /* =============================
-           SIMPAN COOKIE (7 HARI)
+           SIMPAN COOKIE 5 Menit
         ============================= */
-        setcookie('login', $user['no_id'], time() + (86400 * 7), "/");
-        setcookie('role', $user['role'], time() + (86400 * 7), "/");
+        setcookie('login', $user['no_id'], time() + 300, "/"); 
+        setcookie('role', $user['role'], time() + 300, "/");
+
 
         /* =============================
            REDIRECT SESUAI ROLE
@@ -73,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -85,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             -webkit-appearance: none;
             margin: 0;
         }
+
         .register-link {
             font-size: 14px;
             text-align: center;
@@ -95,46 +98,47 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body class="bg-light">
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-4">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
 
-            <div class="card p-4 shadow">
-                <h4 class="text-center mb-3">Login</h4>
+                <div class="card p-4 shadow">
+                    <h4 class="text-center mb-3">Login</h4>
 
-                <?php if ($error): ?>
-                    <div class="alert alert-danger"><?= $error ?></div>
-                <?php endif; ?>
+                    <?php if ($error): ?>
+                        <div class="alert alert-danger"><?= $error ?></div>
+                    <?php endif; ?>
 
-                <form method="POST">
-                    <div class="mb-3">
-                        <label>No Identitas (NIM / NIDN / NIK)</label>
-                        <input type="number" name="no_id" class="form-control" required>
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label>No Identitas (NIM / NIDN / NIK)</label>
+                            <input type="number" name="no_id" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Password</label>
+                            <input type="password" name="password" class="form-control" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            Login
+                        </button>
+                    </form>
+
+                    <div class="register-link">
+                        <small>
+                            Belum Punya Akun?
+                            <a href="register_user.php" class="text-secondary">
+                                Daftar Disini!
+                            </a>
+                        </small>
                     </div>
 
-                    <div class="mb-3">
-                        <label>Password</label>
-                        <input type="password" name="password" class="form-control" required>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100">
-                        Login
-                    </button>
-                </form>
-
-                <div class="register-link">
-                    <small>
-                        Belum Punya Akun?
-                        <a href="register_user.php" class="text-secondary">
-                            Daftar Disini!
-                        </a>
-                    </small>
                 </div>
-
             </div>
         </div>
     </div>
-</div>
 
 </body>
+
 </html>
