@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['email'] = $user['email'];
         $_SESSION['role'] = $user['role'];
         $_SESSION['type_tamu'] = $user['type_tamu'];
-
+        
         /* =============================
            SIMPAN COOKIE 5 Menit
         ============================= */
