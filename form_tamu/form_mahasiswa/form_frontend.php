@@ -24,7 +24,7 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Change Password</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="../../login/logout.php">Logout</a></li>
+                            <li><a class="dropdown-item text-danger" href="../../logout.php">Logout</a></li>
                         </ul>
                     </div>
                 </div>
