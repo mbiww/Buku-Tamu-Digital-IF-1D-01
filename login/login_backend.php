@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
 
     } else {
-        $error = "No ID atau password salah!";
+        $error = "ID atau kata sandi salah, atau akun belum terdaftar.";
     }
 }
 ?>
