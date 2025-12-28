@@ -28,7 +28,7 @@
 
                         <form id="registerForm" action="register.php" method="POST">
                             <div class="mb-3">
-                                <label class="form-label">No Identitas (NIM, NIDN, NIK)</label>
+                                <label class="form-label">No Identitas (NIM, NIDN, No. Badge)</label>
                                 <input type="number" name="no_id" class="form-control" required 
                                        placeholder="Masukkan nomor identitas">
                             </div>
