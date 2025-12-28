@@ -5,5 +5,5 @@ session_destroy();
 setcookie('login', '', time() - 3600, '/');
 setcookie('role', '', time() - 3600, '/');
 
-header('Location: login_user.php');
+header('Location: login/login.php');
 exit;
