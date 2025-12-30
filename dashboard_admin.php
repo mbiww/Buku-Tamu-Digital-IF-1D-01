@@ -417,7 +417,7 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
     <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
         <div class="container-fluid px-3 px-md-4">
             <a class="navbar-brand fw-bold" href="#">
-                <i class="bi bi-journal-text me-2"></i>Dashboard Admin
+                <i class="bi bi-journal-text me-2"></i>Dashboard Admin, <?= htmlspecialchars($nama_user); ?>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
