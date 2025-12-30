@@ -17,8 +17,8 @@
                     <div class="user-info dropdown">
                         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                             <div>
+                                <i class="bi bi-person-circle"></i> |
                                 <span id="userName"><?php echo htmlspecialchars($nama_user ?? 'User'); ?></span> 
-                                <small class="text-light">(<?php echo htmlspecialchars($role_user ?? 'instansi'); ?>)</small>
                             </div>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
@@ -126,8 +126,8 @@
                                         <i class="bi bi-geo-alt"></i>
                                         Instansi
                                     </div>
-                                    <p class="h4 fw-bold text-gray-800 mb-1"><?php echo htmlspecialchars($institusi_user ?? 'Politeknik Negeri Batam'); ?></p>
-                                    <p class="text-gray-600 small mb-0"><?php echo htmlspecialchars($nama_user ?? 'User'); ?></p>
+                                    <p class="h4 fw-bold text-gray-800 mb-1"><?php echo htmlspecialchars($institusi_user ?? 'institusi'); ?></p>
+                                    <p class="text-gray-600 small mb-0"><?php echo htmlspecialchars($nama_user ?? 'User'); ?> (<?php echo htmlspecialchars($no_id_user ?? 'no_id'); ?>)</p>
                                 </div>
                             </div>
                         </div>
@@ -189,19 +189,19 @@
                                 <label>Nama Lengkap :</label>
                                 <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" 
                                        placeholder="Masukkan nama lengkap" 
-                                       value="<?php echo $_POST['nama_lengkap'] ?? ''; ?>">
+                                       value="<?php echo htmlspecialchars($nama_user); ?>">
                             </div>
                             <div class="mb-3">
                                 <label>No Identitas (NIM, NIDN, No. Badge) :</label>
                                 <input type="number" class="form-control" id="no_id" name="no_id" 
                                        placeholder="Contoh: 1234567890" 
-                                       value="<?php echo $_POST['no_id'] ?? ''; ?>">
+                                       value="<?php echo htmlspecialchars($no_id_user); ?>">
                             </div>
                             <div class="mb-3">
                                 <label>Institusi :</label>
                                 <input type="text" class="form-control" id="institusi" name="institusi" 
                                        placeholder="Nama institusi atau perusahaan" 
-                                       value="<?php echo $_POST['institusi'] ?? ''; ?>">
+                                       value="<?php echo htmlspecialchars($institusi_user); ?>">
                             </div>
                             <div class="mb-3">
                                 <label>Alamat :</label>
