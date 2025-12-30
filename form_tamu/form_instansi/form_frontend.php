@@ -12,7 +12,7 @@
     <div class="header">
         <div class="container">
             <div class="header-content">
-                <h4 class="mb-0">Sistem Pendaftaran Tamu</h4>
+                <h4 class="mb-0"><i class="bi bi-journal-text"></i> Pendaftaran Tamu</h4>
                 <div class="d-flex align-items-center gap-3">
                     <div class="user-info dropdown">
                         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
