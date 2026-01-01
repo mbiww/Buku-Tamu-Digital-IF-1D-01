@@ -33,12 +33,22 @@ $jenis_filter = $_GET['jenis_tamu'] ?? '';
 $tanggal_filter = $_GET['tanggal'] ?? '';
 $status_filter = $_GET['status'] ?? '';
 
+// PAGINATION
+$limit = 10; // Jumlah data per halaman
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$offset = ($page - 1) * $limit;
+
 // QUERY DINAMIS DATA TAMU
 $sql_tamu = "SELECT * FROM data_tamu WHERE 1=1";
+$sql_count = "SELECT COUNT(*) as total FROM data_tamu WHERE 1=1";
 
 if (!empty($keyword)) {
     $keyword_escaped = mysqli_real_escape_string($koneksi, $keyword);
     $sql_tamu .= " AND (nama_lengkap LIKE '%$keyword_escaped%' 
+                      OR institusi LIKE '%$keyword_escaped%' 
+                      OR keperluan LIKE '%$keyword_escaped%')";
+    $sql_count .= " AND (nama_lengkap LIKE '%$keyword_escaped%' 
                       OR institusi LIKE '%$keyword_escaped%' 
                       OR keperluan LIKE '%$keyword_escaped%')";
 }
@@ -46,20 +56,28 @@ if (!empty($keyword)) {
 if (!empty($jenis_filter) && $jenis_filter != 'semua') {
     $jenis_filter_escaped = mysqli_real_escape_string($koneksi, $jenis_filter);
     $sql_tamu .= " AND jenis_pengguna = '$jenis_filter_escaped'";
+    $sql_count .= " AND jenis_pengguna = '$jenis_filter_escaped'";
 }
 
 if (!empty($tanggal_filter)) {
     $tanggal_filter_escaped = mysqli_real_escape_string($koneksi, $tanggal_filter);
     $sql_tamu .= " AND DATE(created_at) = '$tanggal_filter_escaped'";
+    $sql_count .= " AND DATE(created_at) = '$tanggal_filter_escaped'";
 }
 
 if (!empty($status_filter) && $status_filter != 'semua') {
     $status_filter_escaped = mysqli_real_escape_string($koneksi, $status_filter);
     $sql_tamu .= " AND status_aktif = '$status_filter_escaped'";
+    $sql_count .= " AND status_aktif = '$status_filter_escaped'";
 }
 
-$sql_tamu .= " ORDER BY id DESC";
+$sql_tamu .= " ORDER BY id DESC LIMIT $offset, $limit";
 $tamu = mysqli_query($koneksi, $sql_tamu);
+
+// HITUNG TOTAL DATA UNTUK PAGINATION
+$count_result = mysqli_query($koneksi, $sql_count);
+$total_data = mysqli_fetch_assoc($count_result)['total'];
+$total_pages = ceil($total_data / $limit);
 
 // QUERY STATISTIK
 $q1 = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM data_tamu WHERE DATE(created_at) = CURDATE()");
@@ -73,6 +91,41 @@ $mahasiswa_hari_ini = mysqli_fetch_assoc($q3)['total'];
 
 $q4 = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM data_tamu WHERE jenis_pengguna = 'instansi'");
 $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
+
+// PROSES CHECK OUT JIKA ADA REQUEST
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'checkout') {
+    $id = intval($_POST['id']);
+    
+    if ($id > 0) {
+        $sql = "UPDATE data_tamu 
+                SET status_aktif = 'tidak aktif', 
+                    waktu_checkout = NOW() 
+                WHERE id = ? AND status_aktif = 'aktif'";
+        
+        $stmt = mysqli_prepare($koneksi, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $id);
+        
+        if (mysqli_stmt_execute($stmt)) {
+            $message = mysqli_stmt_affected_rows($stmt) > 0 
+                ? ['type' => 'success', 'text' => 'Check out berhasil'] 
+                : ['type' => 'warning', 'text' => 'Data tidak ditemukan atau sudah check out'];
+        } else {
+            $message = ['type' => 'danger', 'text' => 'Database error'];
+        }
+        
+        mysqli_stmt_close($stmt);
+    } else {
+        $message = ['type' => 'danger', 'text' => 'ID tidak valid'];
+    }
+    
+    // Redirect untuk refresh data
+    header("Location: dashboard_admin.php?message=" . urlencode($message['text']) . "&type=" . $message['type']);
+    exit;
+}
+
+// Tampilkan pesan jika ada
+$message = isset($_GET['message']) ? $_GET['message'] : '';
+$message_type = isset($_GET['type']) ? $_GET['type'] : '';
 ?>
 
 <!DOCTYPE html>
@@ -233,6 +286,8 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
         .table-responsive {
             border-radius: 10px;
             overflow: hidden;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
         .table {
@@ -268,6 +323,8 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
             font-weight: 600;
             font-size: 0.75rem;
             border-radius: 20px;
+            border: none;
+            cursor: default;
         }
         
         .badge.bg-secondary {
@@ -280,6 +337,30 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
         
         .badge.bg-danger {
             background: linear-gradient(135deg, #f72585, #b5179e) !important;
+        }
+        
+        .badge-checkout {
+            padding: 6px 12px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #dc3545, #c82333) !important;
+            color: white !important;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .badge-checkout:hover {
+            background: linear-gradient(135deg, #c82333, #bd2130) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        }
+        
+        .badge-checkout:active {
+            transform: translateY(0);
         }
         
         /* FORM STYLING */
@@ -341,6 +422,46 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
             padding: 8px 16px;
             font-size: 0.85rem;
         }
+
+        /* PAGINATION STYLING */
+        .pagination-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .pagination-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        
+        .pagination-btn:hover {
+            background: linear-gradient(135deg, #3a56d4, #2f0c91);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+            color: white;
+        }
+        
+        .pagination-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .pagination-btn i {
+            margin-right: 5px;
+        }
         
         /* NO DATA STYLING */
         .no-data {
@@ -361,6 +482,27 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
             height: 2px;
             opacity: 0.7;
             margin: 25px 0;
+        }
+        
+        /* MESSAGE ALERT */
+        .alert-fixed {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
         
         /* RESPONSIVE ADJUSTMENTS */
@@ -389,6 +531,26 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
             .navbar-brand {
                 font-size: 1.2rem;
             }
+            
+            .alert-fixed {
+                left: 10px;
+                right: 10px;
+                min-width: auto;
+            }
+            
+            .badge, .badge-checkout {
+                padding: 5px 10px;
+                font-size: 0.7rem;
+            }
+
+            .pagination-container {
+                justify-content: center;
+            }
+            
+            .pagination-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -412,6 +574,16 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
             </div>
         </div>
     </nav>
+
+    <!-- PESAN ALERT -->
+    <?php if ($message): ?>
+    <div class="alert-fixed">
+        <div class="alert alert-<?= $message_type ?> alert-dismissible fade show shadow-lg" role="alert">
+            <?= htmlspecialchars($message) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <!-- STATISTIK -->
     <div class="container-fluid mt-4">
@@ -479,14 +651,18 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
                                         <th scope="col">Instansi</th>
                                         <th scope="col">Keperluan</th>
                                         <th scope="col">Status</th>
+                                        <th scope="col">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php if(mysqli_num_rows($tamu) > 0): ?>
-                                        <?php $no = 1; while($data = mysqli_fetch_array($tamu)): ?>
+                                        <?php 
+                                        $no = $offset + 1; 
+                                        while($data = mysqli_fetch_array($tamu)): 
+                                        ?>
                                             <tr>
                                                 <td><strong><?= $no++; ?></strong></td>
-                                                <td><?= htmlspecialchars($data['nama_lengkap']); ?></td>
+                                                <td><?= htmlspecialchars($data['nama_lengkap']); ?><br><small>(<?= htmlspecialchars($data['no_id']); ?>)</small></td>
                                                 <td>
                                                     <span class="badge bg-secondary">
                                                         <?= htmlspecialchars($data['jenis_pengguna']); ?>
@@ -501,11 +677,26 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
                                                         <span class="badge bg-danger">Check Out</span>
                                                     <?php endif; ?>
                                                 </td>
+                                                <td>
+                                                    <?php if ($data['status_aktif'] === 'aktif'): ?>
+                                                        <form method="POST" style="display:inline;">
+                                                            <input type="hidden" name="action" value="checkout">
+                                                            <input type="hidden" name="id" value="<?= $data['id']; ?>">
+                                                            <button type="submit" 
+                                                                    class="badge-checkout"
+                                                                    onclick="return confirm('Apakah Anda yakin ingin melakukan Check Out untuk tamu ini?')">
+                                                                Check Out
+                                                            </button>
+                                                        </form>
+                                                    <?php else: ?>
+                                                        <span class="text-muted">-</span>
+                                                    <?php endif; ?>
+                                                </td>
                                             </tr>
                                         <?php endwhile; ?>
                                     <?php else: ?>
                                         <tr>
-                                            <td colspan="6" class="no-data">
+                                            <td colspan="7" class="no-data">
                                                 <i class="bi bi-inbox fs-4 d-block mb-2"></i>
                                                 Tidak ada data ditemukan
                                             </td>
@@ -514,6 +705,39 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- PAGINATION BUTTONS -->
+                        <?php if(mysqli_num_rows($tamu) > 0 && $total_pages > 1): ?>
+                        <div class="pagination-container">
+                            <?php 
+                            // Build query string for pagination while preserving filters
+                            $query_params = [];
+                            if (!empty($keyword)) $query_params['keyword'] = $keyword;
+                            if (!empty($jenis_filter) && $jenis_filter != 'semua') $query_params['jenis_tamu'] = $jenis_filter;
+                            if (!empty($tanggal_filter)) $query_params['tanggal'] = $tanggal_filter;
+                            if (!empty($status_filter) && $status_filter != 'semua') $query_params['status'] = $status_filter;
+                            
+                            $prev_page = $page - 1;
+                            $next_page = $page + 1;
+                            ?>
+                            
+                            <?php if ($page > 1): ?>
+                                <?php $query_params['page'] = $prev_page; ?>
+                                <a href="dashboard_admin.php?<?= http_build_query($query_params) ?>" 
+                                   class="pagination-btn me-2">
+                                    <i class="bi bi-chevron-left"></i> Previous
+                                </a>
+                            <?php endif; ?>
+                            
+                            <?php if ($page < $total_pages): ?>
+                                <?php $query_params['page'] = $next_page; ?>
+                                <a href="dashboard_admin.php?<?= http_build_query($query_params) ?>" 
+                                   class="pagination-btn">
+                                    Next <i class="bi bi-chevron-right"></i>
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -525,6 +749,9 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
                         <h5 class="card-title fw-bold mb-4">Filter & Pencarian</h5>
                         
                         <form method="GET" action="">
+                            <!-- Hidden input untuk page agar reset ke page 1 saat filter diterapkan -->
+                            <input type="hidden" name="page" value="1">
+                            
                             <div class="mb-3">
                                 <label class="form-label fw-medium">Kata Kunci</label>
                                 <input type="text" class="form-control" name="keyword" 
@@ -567,9 +794,11 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
                         </form>
 
                         <hr class="my-4">
-                            <a href="export_pdf.php" class="btn btn-success w-100">
+                        <div class="d-grid gap-2">
+                            <a href="export_pdf.php" class="btn btn-success">
                                 <i class="bi bi-printer me-1"></i> Cetak Laporan
                             </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -591,6 +820,15 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
                     link.classList.remove('active');
                 }
             });
+            
+            // Auto-hide alert setelah 5 detik
+            const alert = document.querySelector('.alert');
+            if (alert) {
+                setTimeout(() => {
+                    alert.classList.remove('show');
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            }
         });
     </script>
 </body>
