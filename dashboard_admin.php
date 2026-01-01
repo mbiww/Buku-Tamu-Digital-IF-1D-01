@@ -390,34 +390,14 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
                 font-size: 1.2rem;
             }
         }
-        
-        /* CUSTOM SCROLLBAR */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #4361ee, #3a0ca3);
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #3a56d4, #2f0c91);
-        }
     </style>
 </head>
 <body class="bg-light">
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
         <div class="container-fluid px-3 px-md-4">
-            <a class="navbar-brand fw-bold" href="#">
-                <i class="bi bi-journal-text me-2"></i>Dashboard Admin, <?= htmlspecialchars($nama_user); ?>
+            <a class="navbar-brand fw-bold" href="dashboard_admin.php">
+                <i class="bi bi-journal-text me-2"></i>Dashboard Admin
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
