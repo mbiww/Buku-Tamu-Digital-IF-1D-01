@@ -1,5 +1,31 @@
 <?php
+session_start();
 include 'koneksi.php';
+
+// CEK SESSION DAN ROLE
+if (!isset($_SESSION['no_id']) || $_SESSION['role'] != 'admin') {
+    header('Location: login/login.php');
+    exit;
+}
+
+$no_id_user = $_SESSION['no_id'];
+$role_user = $_SESSION['role'];
+
+// AMBIL DATA USER
+$query_user = "SELECT nama_lengkap, institusi FROM users WHERE no_id = ?";
+$stmt_user = mysqli_prepare($koneksi, $query_user);
+mysqli_stmt_bind_param($stmt_user, "s", $no_id_user);
+mysqli_stmt_execute($stmt_user);
+$result_user = mysqli_stmt_get_result($stmt_user);
+$user_data = mysqli_fetch_assoc($result_user);
+
+if ($user_data) {
+    $nama_user = $user_data['nama_lengkap'];
+    $institusi_user = $user_data['institusi'];
+} else {
+    $nama_user = $_SESSION['nama'] ?? 'User';
+    $institusi_user = $_SESSION['institusi'] ?? 'Instansi';
+}
 
 /* =========================
    PROSES TAMBAH ADMIN
@@ -49,6 +75,42 @@ if (isset($_POST['tambah_admin'])) {
 }
 
 /* =========================
+   PROSES HAPUS ADMIN
+========================= */
+if (isset($_GET['hapus'])) {
+    $id_hapus = intval($_GET['hapus']);
+    $current_admin_id = $_SESSION['no_id']; // ID admin yang sedang login
+    
+    // Cek apakah admin yang akan dihapus adalah admin yang sedang login
+    $cek_admin = mysqli_query($koneksi, 
+        "SELECT no_id FROM users WHERE id = '$id_hapus' AND role = 'admin'");
+    
+    if (mysqli_num_rows($cek_admin) > 0) {
+        $admin_data = mysqli_fetch_assoc($cek_admin);
+        
+        // Cegah admin menghapus akun sendiri
+        if ($admin_data['no_id'] == $current_admin_id) {
+            $error = "Tidak dapat menghapus akun Anda sendiri!";
+        } else {
+            // Hapus akun admin
+            $hapus = mysqli_query($koneksi, "DELETE FROM users WHERE id = '$id_hapus'");
+            
+            if ($hapus) {
+                $success = "Akun admin berhasil dihapus!";
+            } else {
+                $error = "Gagal menghapus akun admin!";
+            }
+        }
+    } else {
+        $error = "Akun admin tidak ditemukan!";
+    }
+    
+    // Redirect untuk menghapus parameter GET
+    header("Location: pengaturan_akun.php");
+    exit;
+}
+
+/* =========================
    DATA ADMIN
 ========================= */
 $admin = mysqli_query(
@@ -67,6 +129,7 @@ $admin = mysqli_query(
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 <style>
 body {
@@ -74,19 +137,43 @@ body {
   font-family: 'Segoe UI', sans-serif;
 }
 
-/* NAVBAR */
+/* NAVBAR STYLING */
 .navbar {
-  background: linear-gradient(90deg, #3b6df6, #4f8cff);
+    background: #0d6efd;
+    padding: 12px 0;
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
-.navbar-brand,
+
+.navbar-brand {
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand i {
+    font-size: 1.8rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px;
+    border-radius: 10px;
+    margin-right: 10px;
+}
+
 .nav-link {
-  color: #fff !important;
+    font-weight: 500;
+    padding: 8px 15px !important;
+    margin: 0 5px;
+    border-radius: 8px;
 }
-.nav-link.active {
-  font-weight: 600;
-  background: rgba(255,255,255,0.2);
-  border-radius: 12px;
-  padding: 6px 14px;
+
+.nav-link:hover, .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.nav-link.text-danger:hover {
+    background-color: rgba(220, 53, 69, 0.15);
 }
 
 /* CARD */
@@ -118,6 +205,11 @@ body {
   background: linear-gradient(90deg, #325fd8, #3f7ae0);
 }
 
+.btn-danger {
+  border-radius: 8px;
+  padding: 5px 15px;
+}
+
 /* TABLE */
 .table thead {
   background: #eef3ff;
@@ -132,36 +224,58 @@ body {
 }
 .table tbody tr {
   border-bottom: 1px solid #e6ebff;
-}   
+}
 </style>
+
+<script>
+function confirmDelete(id, nama) {
+    if (confirm(`Apakah Anda yakin ingin menghapus akun admin "${nama}"?`)) {
+        window.location.href = `pengaturan_akun.php?hapus=${id}`;
+    }
+    return false;
+}
+</script>
 </head>
 
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg">
-  <div class="container-fluid px-4">
-    <span class="navbar-brand fw-bold">Pengaturan Akun Admin</span>
-    <ul class="navbar-nav ms-auto">
-      <li class="nav-item"><a class="nav-link" href="dashboard_admin.php">Home</a></li>
-      <li class="nav-item"><a class="nav-link" href="data_tamu.php">Data Tamu</a></li>
-      <li class="nav-item"><a class="nav-link" href="laporan.php">Laporan</a></li>
-      <li class="nav-item"><a class="nav-link active" href="pengaturan_akun.php">Pengaturan Akun</a></li>
-      <li class="nav-item"><a class="nav-link text-warning" href="logout.php">Logout</a></li>
-    </ul>
-  </div>
-</nav>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+        <div class="container-fluid px-3 px-md-4">
+            <a class="navbar-brand fw-bold" href="dashboard_admin.php">
+                <i class="bi bi-journal-text me-2"></i>Dashboard Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="dashboard_admin.php">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="data_tamu.php">Data Tamu</a></li>
+                    <li class="nav-item"><a class="nav-link" href="laporan.php">Laporan</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="pengaturan_akun.php">Pengaturan Akun</a></li>
+                    <li class="nav-item"><a class="nav-link text-danger" href="logout.php">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
 
 <div class="container my-5">
 
 <!-- ALERT -->
 <?php if ($success): ?>
-  <div class="alert alert-success"><?= $success; ?></div>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <?= $success; ?>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
 <?php endif; ?>
 
 <?php if ($error): ?>
-  <div class="alert alert-danger"><?= $error; ?></div>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <?= $error; ?>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
 <?php endif; ?>
 
 <!-- TAMBAH ADMIN -->
@@ -192,12 +306,12 @@ body {
     </div>
 
     <button type="submit" name="tambah_admin" class="btn btn-primary mt-2">
-      Tambah Admin
+      <i class="bi bi-person-plus"></i> Tambah Admin
     </button>
   </form>
 </div>
 
-<!-- DAFTAR ADMIN -->
+<!-- DAFTAR AKUN ADMIN -->
 <div class="card-custom">
   <h4 class="fw-bold mb-4">Daftar Akun Admin</h4>
 
@@ -210,16 +324,39 @@ body {
           <th>Email</th>
           <th>No ID</th>
           <th>Role</th>
+          <th>Tanggal Dibuat</th>
+          <th>Aksi</th>
         </tr>
       </thead>
       <tbody>
-        <?php $no=1; while($a=mysqli_fetch_assoc($admin)) { ?>
+        <?php 
+        $no = 1; 
+        $current_admin_no_id = $_SESSION['no_id']; // ID admin yang sedang login
+        while($a = mysqli_fetch_assoc($admin)) { 
+            $is_current_admin = ($a['no_id'] == $current_admin_no_id);
+        ?>
         <tr>
           <td><?= $no++; ?></td>
-          <td><?= $a['nama_lengkap']; ?></td>
+          <td>
+            <?= $a['nama_lengkap']; ?>
+            <?php if ($is_current_admin): ?>
+              <span class="badge bg-info ms-2">Anda</span>
+            <?php endif; ?>
+          </td>
           <td><?= $a['email']; ?></td>
           <td><?= $a['no_id']; ?></td>
           <td><?= $a['role']; ?></td>
+          <td><?= date('d/m/Y', strtotime($a['created_at'])); ?></td>
+          <td>
+            <?php if (!$is_current_admin): ?>
+              <button onclick="return confirmDelete(<?= $a['id']; ?>, '<?= addslashes($a['nama_lengkap']); ?>')" 
+                      class="btn btn-sm btn-danger">
+                <i class="bi bi-trash"></i> Hapus
+              </button>
+            <?php else: ?>
+              <span class="text-muted">-</span>
+            <?php endif; ?>
+          </td>
         </tr>
         <?php } ?>
       </tbody>
@@ -229,5 +366,7 @@ body {
 
 </div>
 
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
