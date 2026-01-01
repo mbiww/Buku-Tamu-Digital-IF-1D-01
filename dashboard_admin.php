@@ -406,7 +406,6 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link active" href="dashboard_admin.php">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="data_tamu.php">Data Tamu</a></li>
-                    <li class="nav-item"><a class="nav-link" href="laporan.php">Laporan</a></li>
                     <li class="nav-item"><a class="nav-link" href="pengaturan_akun.php">Pengaturan Akun</a></li>
                     <li class="nav-item"><a class="nav-link text-danger" href="logout.php">Logout</a></li>
                 </ul>
@@ -568,10 +567,9 @@ $instansi_hari_ini = mysqli_fetch_assoc($q4)['total'];
                         </form>
 
                         <hr class="my-4">
-
-                        <a href="laporan.php" class="btn btn-success w-100">
-                            <i class="bi bi-printer me-1"></i> Cetak Laporan
-                        </a>
+                            <a href="export_pdf.php" class="btn btn-success w-100">
+                                <i class="bi bi-printer me-1"></i> Cetak Laporan
+                            </a>
                     </div>
                 </div>
             </div>
