@@ -226,7 +226,7 @@ body {
 </nav>
 
 <!-- CONTENT -->
-<div class="container">
+<div class="container-fluid px-3 px-md-4">
   <div class="card-custom">
     <h4 class="fw-bold mb-4">Daftar Buku Tamu</h4>
 
@@ -257,11 +257,13 @@ body {
           <tr>
             <th>#</th>
             <th>Nama Tamu</th>
-            <th>Instansi</th>
             <th>Jenis Tamu</th>
+            <th>Institusi</th>
+            <th>Alamat</th>
+            <th>No Whatsapp</th>
             <th>Keperluan</th>
             <th>Waktu Kunjungan</th>
-            <th>Selesai Kunjungan</th>  <!-- Kolom baru -->
+            <th>Selesai Kunjungan</th>
             <th>Aksi</th>
           </tr>
         </thead>
@@ -274,13 +276,15 @@ body {
         ?>
           <tr>
             <td><?= $no++; ?></td>
-            <td><?= htmlspecialchars($data['nama_lengkap']); ?></td>
-            <td><?= htmlspecialchars($data['institusi']); ?></td>
+            <td><?= htmlspecialchars($data['nama_lengkap']); ?><br><small>(<?= htmlspecialchars($data['no_id']); ?>)</small></td>
             <td>
               <span class="badge-mahasiswa">
                 <?= htmlspecialchars($data['jenis_pengguna']); ?>
               </span>
             </td>
+            <td><?= htmlspecialchars($data['institusi']); ?></td>
+            <td><?= htmlspecialchars($data['alamat']); ?></td>
+            <td><?= htmlspecialchars($data['no_wa']); ?></td>
             <td><?= htmlspecialchars($data['keperluan']); ?></td>
             <td>
               <?php 
