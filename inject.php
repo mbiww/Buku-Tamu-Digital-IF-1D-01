@@ -33,13 +33,13 @@ if (!$existing_admin) {
         $user_id = $insert_stmt->insert_id;
         
         // SET SEMUA SESSION VARIABLE YANG DIBUTUHKAN DASHBOARD_ADMIN.PHP
-        $_SESSION['no_id'] = $no_id; // WAJIB - untuk validasi session di dashboard_admin.php
-        $_SESSION['role'] = $role; // WAJIB - untuk validasi role admin
-        $_SESSION['user_id'] = $user_id; // untuk konsistensi
-        $_SESSION['nama_lengkap'] = $nama_lengkap; // untuk tampilan
-        $_SESSION['nama'] = $nama_lengkap; // fallback untuk dashboard_admin.php
-        $_SESSION['email'] = $email; // untuk konsistensi
-        $_SESSION['institusi'] = $institusi; // untuk tampilan
+        $_SESSION['no_id'] = $no_id;
+        $_SESSION['role'] = $role;
+        $_SESSION['user_id'] = $user_id;
+        $_SESSION['nama_lengkap'] = $nama_lengkap;
+        $_SESSION['nama'] = $nama_lengkap;
+        $_SESSION['email'] = $email;
+        $_SESSION['institusi'] = $institusi;
         
         echo "<script>
             alert('Admin berhasil dibuat dan login otomatis!');
@@ -67,11 +67,11 @@ if (!$existing_admin) {
     
     if ($admin_data) {
         // SET SEMUA SESSION VARIABLE YANG DIBUTUHKAN DASHBOARD_ADMIN.PHP
-        $_SESSION['no_id'] = $admin_data['no_id']; // WAJIB
-        $_SESSION['role'] = $admin_data['role']; // WAJIB
+        $_SESSION['no_id'] = $admin_data['no_id'];
+        $_SESSION['role'] = $admin_data['role'];
         $_SESSION['user_id'] = $admin_data['id'];
         $_SESSION['nama_lengkap'] = $admin_data['nama_lengkap'];
-        $_SESSION['nama'] = $admin_data['nama_lengkap']; // fallback
+        $_SESSION['nama'] = $admin_data['nama_lengkap']
         $_SESSION['email'] = $admin_data['email'];
         $_SESSION['institusi'] = $admin_data['institusi'];
         
