@@ -42,7 +42,7 @@ if (!$existing_admin) {
         $_SESSION['institusi'] = $institusi; // untuk tampilan
         
         echo "<script>
-            alert('Admin berhasil dibuat dan login otomatis!\\n\\nID: $no_id\\nPassword: $password');
+            alert('Admin berhasil dibuat dan login otomatis!');
             window.location.href = 'dashboard_admin.php';
         </script>";
         exit();
@@ -76,7 +76,7 @@ if (!$existing_admin) {
         $_SESSION['institusi'] = $admin_data['institusi'];
         
         echo "<script>
-            alert('Admin sudah ada. Login otomatis berhasil!\\n\\nID: {$admin_data['no_id']}\\nPassword: $password');
+            alert('Admin sudah ada. Login otomatis berhasil!');
             window.location.href = 'dashboard_admin.php';
         </script>";
         exit();
