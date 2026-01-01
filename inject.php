@@ -71,7 +71,7 @@ if (!$existing_admin) {
         $_SESSION['role'] = $admin_data['role'];
         $_SESSION['user_id'] = $admin_data['id'];
         $_SESSION['nama_lengkap'] = $admin_data['nama_lengkap'];
-        $_SESSION['nama'] = $admin_data['nama_lengkap']
+        $_SESSION['nama'] = $admin_data['nama_lengkap'];
         $_SESSION['email'] = $admin_data['email'];
         $_SESSION['institusi'] = $admin_data['institusi'];
         
