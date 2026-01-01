@@ -252,7 +252,6 @@ function confirmDelete(id, nama) {
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="dashboard_admin.php">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="data_tamu.php">Data Tamu</a></li>
-                    <li class="nav-item"><a class="nav-link" href="laporan.php">Laporan</a></li>
                     <li class="nav-item"><a class="nav-link active" href="pengaturan_akun.php">Pengaturan Akun</a></li>
                     <li class="nav-item"><a class="nav-link text-danger" href="logout.php">Logout</a></li>
                 </ul>
