@@ -10,4 +10,6 @@ try {
 } catch (PDOException $e) {
     die("Koneksi gagal: " . $e->getMessage());
 }
+
+mysqli_query($koneksi, "SET time_zone = '+07:00'");
 ?>
