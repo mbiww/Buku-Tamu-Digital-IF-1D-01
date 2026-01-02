@@ -49,13 +49,15 @@ if (isset($_POST['update'])) {
     $institusi  = $_POST['institusi'];
     $no_wa      = $_POST['no_wa'];
     $keperluan  = $_POST['keperluan'];
+    $alamat     = $_POST['alamat']; // Tambahan untuk alamat
 
     mysqli_query($koneksi, "
         UPDATE data_tamu SET
         nama_lengkap='$nama',
         institusi='$institusi',
         no_wa='$no_wa',
-        keperluan='$keperluan'
+        keperluan='$keperluan',
+        alamat='$alamat'
         WHERE id='$id'
     ");
 
@@ -97,6 +99,11 @@ if (isset($_POST['update'])) {
         <label>No WhatsApp</label>
         <input type="text" name="no_wa" class="form-control"
                value="<?= $data['no_wa']; ?>">
+      </div>
+
+      <div class="mb-3">
+        <label>Alamat</label>
+        <textarea name="alamat" class="form-control" rows="3"><?= $data['alamat']; ?></textarea>
       </div>
 
       <div class="mb-3">
