@@ -24,14 +24,14 @@
                         <form action="login.php" method="POST">
                             <div class="mb-4">
                                 <label class="form-label">No Identitas (NIM, NIDN, No. Badge)</label>
-                                <input type="number" name="no_id" class="form-control" required 
+                                <input type="number" name="no_id" class="form-control" 
                                        placeholder="Masukkan nomor identitas Anda">
                             </div>
                             
                             <div class="mb-4">
                                 <label class="form-label">Password</label>
                                 <div class="input-group">
-                                    <input type="password" name="password" class="form-control" required 
+                                    <input type="password" name="password" class="form-control" 
                                            placeholder="Masukkan password Anda" id="passwordInput">
                                     <button type="button" class="btn btn-outline-secondary toggle-password" 
                                             onclick="togglePassword('passwordInput')" aria-label="Tampilkan password">
